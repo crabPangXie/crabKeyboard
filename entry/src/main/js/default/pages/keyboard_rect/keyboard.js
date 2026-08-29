@@ -697,6 +697,7 @@ export default {
                 totalShift += disArr[i]//;移动总位移
             };
             const totalTime = timeArr[0] - timeArr[n];
+            if (totalTime<=0||totalDist==0)return;
             let v=Math.sign(totalShift)*Math.min(totalDist / totalTime,12);
 
             clearInterval(timer_ani);
@@ -804,6 +805,18 @@ export default {
         timer_ani = setInterval(fn, 33);
     },
     scrollTo(){
+        if(this.aniPos){
+            this.keyType=this.aniType;
+            if(this.aniPos>0){
+                this.keyPos=0;
+                this.aniDotPos=0;
+            }else{
+                this.keyPos=this.aniPos+408;
+                this.aniDotPos=100;
+            };
+            this.aniPos=0;
+            this.aniOpacity=0;
+        };
         lineHeight=this.lineWArr.length+1;
         nextLineWArr.forEach((w)=>{
             if (w==0) lineHeight++;
