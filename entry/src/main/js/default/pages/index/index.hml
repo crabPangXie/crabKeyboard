@@ -1,0 +1,11 @@
+<div class="container">
+    <text class="title">螃蟹输入法 demo</text>
+    <div class="inputBox">
+        <marquee class="container" style="background-color: transparent;color: {{value?'#000000':'#9A948A'}};">{{value||'请输入文字'}}</marquee>
+    </div>
+    <div class="buttonRow">
+        <input class="keyboardButton" value="rect键盘" on:click="openKeyboard('rect')"></input>
+        <input class="keyboardButton" value="circle键盘" on:click="openKeyboard('circle')"></input>
+    </div>
+    <text style="color: #4d000000;margin-top: 20px;">v 1.0.0</text>
+</div>

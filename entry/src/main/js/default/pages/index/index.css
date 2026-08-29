@@ -1,0 +1,51 @@
+.container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: #F4F1E8;
+    text-align: center;
+}
+
+.title {
+    width: 100%;
+    height: 55px;
+    margin-top: 62px;
+    font-size: 38px;
+    text-align: center;
+    color: #242424;
+}
+
+.inputBox {
+    display: flex;
+    width: 360px;
+    height: 82px;
+    margin-top: 50px;
+    justify-content: center;
+    align-items: center;
+    background-color: #FFFFFF;
+    border-radius: 18px;
+}
+
+
+.buttonRow {
+    display: flex;
+    width: 360px;
+    height: 72px;
+    margin-top: 42px;
+    justify-content: space-between;
+}
+
+.keyboardButton {
+    width: 168px;
+    height: 72px;
+    justify-content: center;
+    align-items: center;
+    background-color: #242424;
+    border-radius: 16px;
+    text-align: center;
+    font-size: 30px;
+    color: #FFFFFF;
+}

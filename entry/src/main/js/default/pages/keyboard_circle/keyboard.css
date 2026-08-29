@@ -1,0 +1,202 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+}
+.text{
+    width: 330px;
+    left: 68px;
+    line-height:38px;
+}
+.text_current{
+    width: 370px;
+    left: 39px;
+    height: 38px;
+}
+.text_cursor{
+    width: 3px;
+    height: 34px;
+    background-color: #3895FF;
+}
+.confirm{
+    width: 40px;
+    height: 40px;
+    top: 70px;
+    left: 360px;
+    border-radius: 0px;
+    background-color:transparent;
+}
+.keyContainer{
+    width: 100%;
+    height: 332px;
+    top: 134px;
+    background-color: #1C1C1C;
+
+}
+
+.bar{
+    width: 310px;
+    height: 60px;
+    top: 5px;
+    left: 26px;
+}
+.bar_pyList{
+    width: 260px;
+    height: 40px;
+    top: 10px;
+    left: 50px;
+    flex-direction: row;
+    background-color: transparent;
+}
+.bar_py{
+    background-color: #404040;
+    border-radius: 15px;
+}
+.bar_pyItem{
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    margin: 0px 5px;
+}
+.bar_shadow{
+    width: 30px;
+    height: 60px;
+    left: 280px;
+}
+.bar_cover{
+    width: 65px;
+    height: 60px;
+}
+.delete{
+    width: 100px;
+    height: 60px;
+    left: 341px;
+    top: 5px;
+    background-image:url('/common/keyboard/circle/delete.png');
+    background-color: transparent;
+    border-radius: 0px;
+}
+.keyboard {
+    height: 180px;
+    top: 70px;
+}
+.tip{
+    width: 38px;
+    height: 85px;
+    top: 115px;
+}
+.progress{
+    width: 124px;
+    height: 10px;
+    background-color: #303030;
+    border-radius: 10px;
+    left: 171px;
+    top: 255px;
+}
+.progress_dot{
+    width: 36px;
+    height: 22px;
+    top: 249px;
+}
+.btn{
+    width: 130px;
+    height: 45px;
+    top: 270px;
+    background-color: transparent;
+    border-radius: 0px;
+}
+.alert_close{
+    width: 60px;
+    height: 60px;
+    background-color: transparent;
+    border-radius: 0px;
+    background-image:url('/common/keyboard/common/close.png');
+}
+.alert_bar{
+    width: 100%;
+    height: 100px;
+    margin-bottom: -10px;
+    justify-content: space-between;
+    align-items: center;
+    padding:20px;
+}
+.alert{
+    width: 400px;
+    height: 420px;
+    margin-left: 33px;
+    border-radius: 40px;
+    background-color: #212121;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    animation-duration: 280ms;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+}
+@keyframes up{
+    from{
+        transform: translateY(380);
+    }
+    to{
+        transform: translateY(0);
+    }
+}
+@keyframes down{
+    from{
+        transform: translateY(-380);
+    }
+    to{
+        transform: translateY(0);
+    }
+}
+.alert_list{
+    width: 340px;
+    height: 290px;
+    background-color: transparent;
+}
+.alert_item{
+    width: 100%;
+    height: 75px;
+    align-items: center;
+}
+.alert_shear{
+    width: 100%;
+    height: 70px;
+    text-align: left;
+    padding: 0px 10px;
+    background-color: #353535;
+    color: #d9d9d9;
+    border-radius: 20px;
+}
+.alert_smallItem{
+    width: 100%;
+    height: 83px;
+    justify-content: space-between;
+    align-items: center;
+}
+.alert_py{
+    width: 80px;
+    text-align: center;
+    height: 76px;
+    color: #d9d9d9;
+    line-height:32px;
+    background-color: #353535;
+    border-radius: 20px;
+}
+
+.msg{
+    width:320px;
+    height: 70px;
+    left: 73px;
+    top: 350px;
+    background-color: #f7383838;
+    border-radius: 35px;
+    text-align: center;
+    font-size: 30px;
+}
