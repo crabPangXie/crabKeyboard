@@ -1,7 +1,5 @@
 # CrabKeyboard
 
-HarmonyOS LiteWearable HML 键盘页面。本 README 只说明如何在其他业务页面中接入，不重复介绍键盘内部实现。
-
 ## 演示视频
 
 [观看螃蟹输入法演示](docs/crab-keyboard-demo.mp4)
