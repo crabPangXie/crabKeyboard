@@ -3,7 +3,7 @@
     <text class="text" on:longpress="pressText" style="top: {{linePos+70}};">{{prevLines}}\n{{nextLines}}</text>
     <div class="text" style="height: 38px;top: {{linePos+38*lineWArr.length+70}};">
         <text style="line-height:38px;">{{text}}</text>
-        <div class="text_cursor" style="opacity: {{showCursor?1:0}};margin-left: {{text.length==0?0:-2}};margin-right: {{text.length==0?-3:-1}}"></div>
+        <div class="text_cursor" style="opacity: {{showCursor||cursorSteady?1:0}};margin-left: {{text.length==0?0:-2}};margin-right: {{text.length==0?-3:-1}}"></div>
         <text style="line-height:38px">{{nextText}}</text>
     </div>
     <text if="{{!prevLines&&!text&&nextText==constN&&!nextLines}}" class="text" style="height: 38px;top: {{linePos+38*lineWArr.length+70}};color: #808080;">{{prompt}}</text>
@@ -49,6 +49,8 @@
         <input class="btn" if="{{allowNewline}}" grab:click="enter" style="width: 70px;left: 265px;background-image:url('/common/keyboard/circle/enter.png');"></input>
         <input class="btn" if="{{!allowNewline}}" grab:click="done" style="width: 70px;left: 265px;background-image:url('/common/keyboard/circle/search.png');"></input>
     </stack>
+<!--    点击反馈-->
+    <text class="popup" show="{{!!popup.text}}" style="animation-name: {{!!popup.text?'pop':''}};left: {{popup.left}};top: {{popup.top}};">{{popup.text}}</text>
 <!--    弹窗-->
     <stack class="container" show="{{alertShow}}" grab:click="grabClick" grab:swipe="closeAlert"></stack>
     <div class="alert" show="{{alertIf}}" grab:swipe="closeAlert" style="top: {{100+(alertShow?0:380)}};animation-name: {{alertShow?'up':'down'}};">

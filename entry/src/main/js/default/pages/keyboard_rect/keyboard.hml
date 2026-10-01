@@ -3,7 +3,7 @@
     <text class="text" on:longpress="pressText" style="top: {{linePos+90}};">{{prevLines}}\n{{nextLines}}</text>
     <div class="text" style="height: 38px;top: {{linePos+38*lineWArr.length+90}};">
         <text style="line-height:38px;">{{text}}</text>
-        <div class="text_cursor" style="opacity: {{showCursor?1:0}};margin-left: {{text.length==0?0:-2}};margin-right: {{text.length==0?-3:-1}}"></div>
+        <div class="text_cursor" style="opacity: {{showCursor||cursorSteady?1:0}};margin-left: {{text.length==0?0:-2}};margin-right: {{text.length==0?-3:-1}}"></div>
         <text style="line-height:38px">{{nextText}}</text>
     </div>
     <text if="{{!prevLines&&!text&&nextText==constN&&!nextLines}}" class="text" style="height: 38px;top: {{linePos+38*lineWArr.length+90}};color: #808080;">{{prompt}}</text>
@@ -14,6 +14,7 @@
 <!--键盘背景-->
     <image if="{{!!pinyin}}" style="width: 466px;height: 35px;top: 125px;" src="/common/keyboard/common/pyShadow.png"></image>
     <text if="{{!!pinyin}}" style="left: 30px;top:122px;height: 38px;color:#3895FF;">{{pinyin}}</text>
+    <text class="popup" show="{{!!popup.text}}" style="animation-name: {{!!popup.text?'pop':''}};left: {{popup.left}};top: {{popup.top}};">{{popup.text}}</text>
     <stack class="keyContainer" grab:swipe="grabClick">
 <!--        工具栏-->
         <image class="bar" grab:click="clickFn" grab:longpress="pressFn" grab:touchend="stopOperate" src="/common/keyboard/common/toolBar.png"></image>

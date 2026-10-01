@@ -9,8 +9,8 @@
     height: 100%;
 }
 .text{
-    width: 330px;
-    left: 68px;
+    width: 320px;
+    left: 73px;
     line-height:38px;
 }
 .text_current{
@@ -22,6 +22,28 @@
     width: 3px;
     height: 34px;
     background-color: #3895FF;
+}
+.popup{
+    width: 89px;
+    height: 90px;
+    background-color: #444444;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 38px;
+    animation-name: pop;
+    animation-duration: 80ms;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-out;
+}
+@keyframes pop{
+    from{
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to{
+        opacity: 1;
+        transform: translateY(0px);
+    }
 }
 .confirm{
     width: 40px;

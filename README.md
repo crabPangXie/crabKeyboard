@@ -1,5 +1,19 @@
 # CrabKeyboard
 
+当前版本：**1.1.0** · 更新日期：**2026-10-01**
+
+## 更新日志
+
+### v1.1.0 · 2026-10-01
+
+- 新增 **flash 轻量词库**，仅保留单字和双字词语；使用轻量词库并移除全量词库后，本次发布包体约 **3.5 MB**，体积减少约 **50%**。
+- 优化键盘切换触发阈值和拖动阻尼，减少误触。
+- 增加键入反馈：点击和长按按键时显示字符提示；连续移动光标时保持光标常亮。
+- 增强键盘长按小字的字重和亮度，提高可读性。
+- 修复已知 bug。
+
+包体数据为本次发布说明中的参考值，实际大小受构建模式、表盘页面及所含资源影响；词库文件大小与完整安装包大小不同。
+
 ## 演示视频
 
 [观看螃蟹输入法演示](docs/crab-keyboard-demo.mp4)
@@ -18,25 +32,55 @@ CrabKeyboard 是面向 HarmonyOS LiteWearable 的多功能输入组件，提供�
 - 支持矩形与圆形表盘布局
 - 可通过路由参数接入其他业务页面
 
+## 词库介绍与切换
+
+两套词库使用相同的 `key*.dat` / `value*.dat` 索引格式，共用 `lookupDictV5.js` 读取器，无需更改查询逻辑。
+
+| 对比项 | flash 轻量词库（默认） | 全量词库 |
+| --- | --- | --- |
+| 目录 | `pinyinDictV5_flash1001` | `pinyinDictV5_20260416` |
+| 词库文件合计大小 | 1,136,195 字节，约 **1.14 MB** | 3,909,006 字节，约 **3.91 MB** |
+| 收录范围 | 单字、双字词语 | 单字、双字及三字以上词语 |
+| 多字文本输入 | 通过单字、双字候选分段组合输入 | 可直接选择词库中收录的较长词语 |
+| 候选排序 | 保留原词库中剩余候选的顺序 | 原始候选顺序 |
+| 适合场景 | 包体受限、日常短文本输入 | 更重视长词候选覆盖的场景 |
+
+flash 由全量词库过滤掉超过两个字的词条并重建索引而来，词库文件体积减少约 **70.93%**。两者均保留拼音前缀回退查询和输入偏好功能；切换词库不影响英文、数字、符号及剪切板功能。表中 MB 按 1,000,000 字节计算。
+
+### 如何切换词库
+
+在 `keyboard_rect/keyboard.js` 和 `keyboard_circle/keyboard.js` 顶部，二选一取消注释：
+
+```javascript
+// 轻量
+const dictPath='internal://app/rawfile/pinyinDictV5_flash1001';
+// 全量
+// const dictPath='internal://app/rawfile/pinyinDictV5_20260416';
+```
+
+然后确保 `entry/src/main/resources/rawfile/` 下只保留要用的那一个词库目录，重新构建即可。
+
+本仓库同时保留了两套词库，默认使用 flash。两个目录都保留时不会减小包体，需要得到约 3.5 MB 的包体时，请先移出未使用的词库目录（建议存放到项目资源目录之外）。
+
 ## 接入步骤
 
 以下路径以 `entry/src/main` 为例。
 
 ### 1. 复制字典文件
 
-将完整字典目录复制到自己的 `rawfile`：
+默认使用 flash 轻量词库，将完整目录复制到自己的 `rawfile`：
 
 ```text
-entry/src/main/resources/rawfile/pinyinDictV5_20260416/
+entry/src/main/resources/rawfile/pinyinDictV5_flash1001/
 ```
 
 目录名和其中的 `key*.dat`、`value*.dat` 文件必须保持不变。键盘默认读取：
 
 ```text
-internal://app/rawfile/pinyinDictV5_20260416
+internal://app/rawfile/pinyinDictV5_flash1001
 ```
 
-如果修改目录名，需要同步修改 `keyboard_rect/keyboard.js` 和 `keyboard_circle/keyboard.js` 中的 rawfile 路径。
+如果需要全量词库，请按上方“如何切换词库”操作；修改目录名时，需要同步修改两种键盘页面中的 `dictPath`。
 
 ### 2. 复制键盘页面
 

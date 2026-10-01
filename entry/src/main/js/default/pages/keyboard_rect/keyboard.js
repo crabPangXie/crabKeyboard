@@ -2,10 +2,14 @@
  * 项目名称：CrabKeyboard
  * 项目作者：crabKun
  * 文件用途：LiteWearable 中文输入键盘及候选词处理
- * 当前版本：1.0.0
+ * 当前版本：1.1.0
  * 开源协议：MIT License
  * 创建日期：2026.8.29
  */
+
+// 注释对应选项可切换词库，确认切换后，删除 rawfile 中的未选用词库目录才能真正减小安装包；两个目录都保留会一起打包。
+const dictPath='internal://app/rawfile/pinyinDictV5_flash1001';//轻量化词库，仅包含单字和双字词语，大小1.14 MB
+// const dictPath='internal://app/rawfile/pinyinDictV5_20260416';//全量词库，包含三字以上词语，大小3.91 MB
 
 import Vibrator from '@system.vibrator';
 import File from '@system.file';
@@ -42,6 +46,7 @@ let timer_operate;
 let timer_ani;
 let timer_alert;
 let timer_focus;
+let timer_popup;
 let moveKey=true;//移动对象为键盘还是文本框
 let oriX=0;
 let oriY=0;
@@ -92,6 +97,12 @@ export default {
         linePos:0,//当前行所在位置
         constN:'\n',
         showCursor:false,
+        cursorSteady:false,
+        popup:{
+            text:'',
+            left:0,
+            top:0
+        },
 
         pinyin:'',
         pyList:[],
@@ -134,6 +145,7 @@ export default {
         };
     },
     onHide(){
+        this.stopOperate();
         if (this.$refs.text.rotation) {
             this.$refs.text.rotation({focus:false})
         };
@@ -144,6 +156,7 @@ export default {
         clearInterval(timer_ani);
         clearTimeout(timer_alert);
         clearTimeout(timer_focus);
+        clearTimeout(timer_popup);
         if(prefsDirty)this.savePrefs();
         if (this.shearList.length) {
             File.writeText({
@@ -188,20 +201,30 @@ export default {
             params:obj
         });
     },
+    showPopup(w,row,line,time=200){
+        clearTimeout(timer_popup);
+        this.popup.left=row*57+29*line+this.keyPos-16;
+        this.popup.top=line*60+230-80;
+        this.popup.text=w;
+        timer_popup=setTimeout(()=>{
+            this.popup.text='';
+        },time)
+    },
     click(e){
         const line=Math.floor((e.globalY-230)/60);
         if (line<0||line>2||e.globalX-this.keyPos-29*line<0)return;
         const row=Math.floor((e.globalX-this.keyPos-29*line)/57);
         if (row<0||row>(this.keyType==3?12:9)-line)return;
+        let word='';
         switch (this.keyType){
             case 3:
-                this.input(key_symbol[line][row]);
+                word=key_symbol[line][row];
                 break
             case 2:
-                this.input(key_en[line][row].toUpperCase());
+                word=key_en[line][row].toUpperCase();
                 break
             case 1:
-                this.input(key_en[line][row])
+                word=key_en[line][row];
                 break
             case 0:
                 if (line==2&&row==7) {
@@ -211,31 +234,38 @@ export default {
                     this.input('，');
                     return
                 };
-                this.pinyin+=key_en[line][row];
+                word=key_en[line][row];
+                this.showPopup(word,row,line);
+                this.pinyin+=word;
                 this.updateCandidates()
-                break
+                return
 
         }
+        this.input(word);
+        this.showPopup(word,row,line);
     },
     press(e){
         const line=Math.floor((e.globalY-230)/60);
         if (line<0||line>2||e.globalX-this.keyPos-29*line<0)return;
         const row=Math.floor((e.globalX-this.keyPos-29*line)/57);
         if (row<0||row>(this.keyType==3?12:9)-line)return;
+        let word='';
         switch (this.keyType){
             case 3:
-                this.input(key_syShift[line][row]);
+                word=key_syShift[line][row]
                 break
             case 0:
                 if (this.pinyin) {
                     this.clearCandidates()
 
                 };
-                this.input(key_cnShift[line][row]);
+                word=key_cnShift[line][row]
                 break
             default:
-                this.input(key_enShift[line][row]);
+                word=key_enShift[line][row]
         };
+        this.input(word);
+        this.showPopup(word,row,line,300);
         Vibrator.vibrate({mode:'short'});
     },
     //选中候选词：写入文本、消费拼音、刷新MTF偏好与候选
@@ -294,6 +324,7 @@ export default {
     },
     pressDelete(){
         clearInterval(timer_operate);
+        this.cursorSteady=true;
         Vibrator.vibrate({
             mode: 'short',
         });
@@ -301,15 +332,17 @@ export default {
         timer_operate=setInterval(this.delete,80)
     },
     stopOperate(){
+        this.cursorSteady=false;
         clearInterval(timer_operate);
     },
     pressFn(e){
-        clearInterval(timer_operate);
+        this.stopOperate();
         let idx=Math.floor((e.globalX-10)/75);
         switch (idx){
             case 0://向左移动光标
                 this.cursorLeft();
                 timer_operate=setInterval(this.cursorLeft,80);
+                this.cursorSteady=true;
                 Vibrator.vibrate({
                     mode: 'short',
                 });
@@ -317,6 +350,7 @@ export default {
             case 3://向右移动光标
                 this.cursorRight();
                 timer_operate=setInterval(this.cursorRight,80);
+                this.cursorSteady=true;
                 Vibrator.vibrate({
                     mode: 'short',
                 });
@@ -324,7 +358,7 @@ export default {
         }
     },
     clickFn(e){
-        clearInterval(timer_operate);
+        this.stopOperate();
         let idx=Math.floor((e.globalX-10)/75);
         switch (idx){
             case 0://向左移动光标
@@ -636,10 +670,10 @@ export default {
             distance=e.globalX-oriX;
             if (this.keyPos>=0&&distance>0) {
                 let gap=this.keyPos;
-                this.keyPos=Math.min(80,this.keyPos+distance*(1-gap/85))
+                this.keyPos=Math.min(120,this.keyPos+distance*0.6*Math.max(0,1-gap/125))
             }else if (this.keyPos<=maxLimit&&distance<0) {
                 let gap=maxLimit-this.keyPos;
-                this.keyPos=Math.max(maxLimit-80,this.keyPos+distance*(1-gap/85))
+                this.keyPos=Math.max(maxLimit-120,this.keyPos+distance*0.6*Math.max(0,1-gap/125))
             }else {
                 this.keyPos+=distance;
             };
@@ -669,10 +703,10 @@ export default {
         //结束时的处理
         if (moveKey){
             if (this.keyPos>0) {
-                if(this.keyPos>60)this.decKeyboard();
+                if(this.keyPos>80)this.decKeyboard();
                 else this.back(0);
             }else if (this.keyPos<maxLimit){
-                if(this.keyPos<maxLimit-60 )this.incKeyboard();
+                if(this.keyPos<maxLimit-80 )this.incKeyboard();
                 else this.back(maxLimit)
             }else this.inertia()
         }else {
@@ -915,7 +949,7 @@ export default {
             return;
         };
         lookupDict.lookupDict(
-            "internal://app/rawfile/pinyinDictV5_20260416",
+            dictPath,
             key,
             (actualKey, actualValue) => {
                 if (thisUpdateCount !== updateCount) return;

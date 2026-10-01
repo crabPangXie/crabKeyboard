@@ -7,5 +7,5 @@
         <input class="keyboardButton" value="rect键盘" on:click="openKeyboard('rect')"></input>
         <input class="keyboardButton" value="circle键盘" on:click="openKeyboard('circle')"></input>
     </div>
-    <text style="color: #4d000000;margin-top: 20px;">v 1.0.0</text>
+    <text style="color: #4d000000;margin-top: 20px;">v 1.1.0</text>
 </div>
