@@ -12,3 +12,4 @@
 /.clangd
 /.clang-format
 /.clang-tidy
+/AGENTS.md
