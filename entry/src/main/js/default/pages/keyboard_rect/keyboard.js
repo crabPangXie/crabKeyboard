@@ -231,16 +231,15 @@ export default {
                     if (this.pinyin) {
                         this.clearCandidates()
                     };
-                    this.input('，');
+                    word='，';
+                }else {
+                    word=key_en[line][row];
+                    this.pinyin+=word;
+                    this.showPopup(word,row,line);
+                    this.updateCandidates();
                     return
-                };
-                word=key_en[line][row];
-                this.showPopup(word,row,line);
-                this.pinyin+=word;
-                this.updateCandidates()
-                return
-
-        }
+                }
+        };
         this.input(word);
         this.showPopup(word,row,line);
     },

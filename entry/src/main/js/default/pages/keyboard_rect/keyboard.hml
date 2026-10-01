@@ -1,11 +1,12 @@
 <stack class="container" on:swipe="cancel" on:touchstart="touchStart(false)" on:touchmove="touchMove" on:touchend="touchEnd">
     <slider on:change="listenCrown" max="100" value="{{focusValue}}" min="0" ref="text"></slider>
-    <text class="text" on:longpress="pressText" style="top: {{linePos+90}};">{{prevLines}}\n{{nextLines}}</text>
-    <div class="text" style="height: 38px;top: {{linePos+38*lineWArr.length+90}};">
+    <text class="text" on:longpress="pressText" style="top: {{linePos+90}};">{{prevLines}}</text>
+    <div class="text" style="width: 370px;height: 38px;top: {{linePos+38*lineWArr.length+90}};" on:longpress="pressText">
         <text style="line-height:38px;">{{text}}</text>
         <div class="text_cursor" style="opacity: {{showCursor||cursorSteady?1:0}};margin-left: {{text.length==0?0:-2}};margin-right: {{text.length==0?-3:-1}}"></div>
         <text style="line-height:38px">{{nextText}}</text>
     </div>
+    <text class="text" on:longpress="pressText" style="width: 370px;top: {{linePos+38*lineWArr.length+128}};">{{nextLines}}</text>
     <text if="{{!prevLines&&!text&&nextText==constN&&!nextLines}}" class="text" style="height: 38px;top: {{linePos+38*lineWArr.length+90}};color: #808080;">{{prompt}}</text>
 <!--    顶部确认按钮-->
     <input grab:click="cancel" class="confirm" style="width: 94px;left: 35px;background-image:url('/common/keyboard/rect/cancel.png');"></input>
@@ -14,7 +15,6 @@
 <!--键盘背景-->
     <image if="{{!!pinyin}}" style="width: 466px;height: 35px;top: 125px;" src="/common/keyboard/common/pyShadow.png"></image>
     <text if="{{!!pinyin}}" style="left: 30px;top:122px;height: 38px;color:#3895FF;">{{pinyin}}</text>
-    <text class="popup" show="{{!!popup.text}}" style="animation-name: {{!!popup.text?'pop':''}};left: {{popup.left}};top: {{popup.top}};">{{popup.text}}</text>
     <stack class="keyContainer" grab:swipe="grabClick">
 <!--        工具栏-->
         <image class="bar" grab:click="clickFn" grab:longpress="pressFn" grab:touchend="stopOperate" src="/common/keyboard/common/toolBar.png"></image>
@@ -50,6 +50,8 @@
         <input class="btn" if="{{allowNewline}}" grab:click="enter" style="left: 207px;background-image:url('/common/keyboard/rect/enter.png');"></input>
         <input class="btn" if="{{!allowNewline}}" grab:click="done" style="left: 207px;background-image:url('/common/keyboard/rect/search.png');"></input>
     </stack>
+<!--    点击反馈-->
+    <text class="popup" show="{{!!popup.text}}" style="animation-name: {{!!popup.text?'pop':''}};left: {{popup.left}};top: {{popup.top}};">{{popup.text}}</text>
 <!--    弹窗-->
     <stack class="container" show="{{alertShow}}" grab:click="grabClick" grab:swipe="closeAlert"></stack>
     <div class="alert" show="{{alertIf}}" grab:swipe="closeAlert" style="top: {{100+(alertShow?0:380)}};animation-name: {{alertShow?'up':'down'}};">

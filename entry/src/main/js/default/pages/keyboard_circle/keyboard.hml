@@ -1,11 +1,12 @@
 <stack class="container" on:swipe="cancel" on:touchstart="touchStart(false)" on:touchmove="touchMove" on:touchend="touchEnd">
     <slider on:change="listenCrown" max="100" value="{{focusValue}}" min="0" ref="text"></slider>
-    <text class="text" on:longpress="pressText" style="top: {{linePos+70}};">{{prevLines}}\n{{nextLines}}</text>
-    <div class="text" style="height: 38px;top: {{linePos+38*lineWArr.length+70}};">
+    <text class="text" on:longpress="pressText" style="top: {{linePos+70}};">{{prevLines}}</text>
+    <div class="text" on:longpress="pressText" style="width: 320px;height: 38px;top: {{linePos+38*lineWArr.length+70}};">
         <text style="line-height:38px;">{{text}}</text>
         <div class="text_cursor" style="opacity: {{showCursor||cursorSteady?1:0}};margin-left: {{text.length==0?0:-2}};margin-right: {{text.length==0?-3:-1}}"></div>
         <text style="line-height:38px">{{nextText}}</text>
     </div>
+    <text class="text" on:longpress="pressText" style="width: 320px;top: {{linePos+38*lineWArr.length+108}};">{{nextLines}}</text>
     <text if="{{!prevLines&&!text&&nextText==constN&&!nextLines}}" class="text" style="height: 38px;top: {{linePos+38*lineWArr.length+70}};color: #808080;">{{prompt}}</text>
 
     <image if="{{!!pinyin}}" style="width: 466px;height: 35px;top: 99px;" src="/common/keyboard/common/pyShadow.png"></image>
