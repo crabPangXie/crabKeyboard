@@ -3,8 +3,8 @@
     "bundleName": "com.crab.keyboard",
     "vendor": "crab",
     "version": {
-      "code": 2,
-      "name": "1.1.0"
+      "code": 3,
+      "name": "1.1.5"
     }
   },
   "deviceConfig": {

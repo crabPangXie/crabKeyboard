@@ -2,7 +2,7 @@
  * 项目名称：CrabKeyboard
  * 项目作者：crabKun
  * 文件用途：LiteWearable 中文输入键盘及候选词处理
- * 当前版本：1.1.0
+ * 当前版本：1.1.5
  * 开源协议：MIT License
  * 创建日期：2026.8.29
  */
@@ -47,7 +47,7 @@ let timer_ani;
 let timer_alert;
 let timer_focus;
 let timer_popup;
-let moveKey=true;//移动对象为键盘还是文本框
+let moveType=0;//0：文本框，1：键盘，2：滑动输入
 let oriX=0;
 let oriY=0;
 let disArr=[];
@@ -101,7 +101,8 @@ export default {
         popup:{
             text:'',
             left:0,
-            top:0
+            top:0,
+            lowerLimit:0
         },
 
         pinyin:'',
@@ -148,6 +149,12 @@ export default {
         this.stopOperate();
         if (this.$refs.text.rotation) {
             this.$refs.text.rotation({focus:false})
+        };
+        if (this.$refs.shear.rotation) {
+            this.$refs.shear.rotation({focus:false})
+        };
+        if (this.$refs.py.rotation) {
+            this.$refs.py.rotation({focus:false})
         };
     },
     onDestroy(){
@@ -204,7 +211,8 @@ export default {
     showPopup(w,row,line,time=200){
         clearTimeout(timer_popup);
         this.popup.left=row*57+29*line+this.keyPos-16;
-        this.popup.top=line*60+205-80;
+        this.popup.top=line*60+120;
+        this.popup.lowerLimit=0;
         this.popup.text=w;
         timer_popup=setTimeout(()=>{
             this.popup.text='';
@@ -243,25 +251,27 @@ export default {
         this.input(word);
         this.showPopup(word,row,line);
     },
-    press(e){
-        const line=Math.floor((e.globalY-205)/60);
-        if (line<0||line>2||e.globalX-this.keyPos-29*line<0)return;
-        const row=Math.floor((e.globalX-this.keyPos-29*line)/57);
-        if (row<0||row>(this.keyType==3?12:9)-line)return;
-        let word='';
+    getShiftText(line,row){
         switch (this.keyType){
             case 3:
-                word=key_syShift[line][row]
+                return key_syShift[line][row]
                 break
             case 0:
                 if (this.pinyin) {
                     this.clearCandidates()
                 };
-                word=key_cnShift[line][row]
+                return key_cnShift[line][row]
                 break
             default:
-                word=key_enShift[line][row]
+                return key_enShift[line][row]
         };
+    },
+    press(e){
+        const line=Math.floor((e.globalY-205)/60);
+        if (line<0||line>2||e.globalX-this.keyPos-29*line<0)return;
+        const row=Math.floor((e.globalX-this.keyPos-29*line)/57);
+        if (row<0||row>(this.keyType==3?12:9)-line)return;
+        let word=this.getShiftText(line,row);
         this.input(word);
         this.showPopup(word,row,line,300);
         Vibrator.vibrate({mode:'short'});
@@ -327,7 +337,7 @@ export default {
             mode: 'short',
         });
         this.delete();
-        timer_operate=setInterval(this.delete,80)
+        timer_operate=setInterval(this.delete,40)
     },
     stopOperate(){
         this.cursorSteady=false;
@@ -339,7 +349,7 @@ export default {
         switch (idx){
             case 0://向左移动光标
                 this.cursorLeft();
-                timer_operate=setInterval(this.cursorLeft,80);
+                timer_operate=setInterval(this.cursorLeft,40);
                 this.cursorSteady=true;
                 Vibrator.vibrate({
                     mode: 'short',
@@ -347,7 +357,7 @@ export default {
                 break
             case 3://向右移动光标
                 this.cursorRight();
-                timer_operate=setInterval(this.cursorRight,80);
+                timer_operate=setInterval(this.cursorRight,40);
                 this.cursorSteady=true;
                 Vibrator.vibrate({
                     mode: 'short',
@@ -369,6 +379,9 @@ export default {
                 this.showPy=false;
                 this.alertIf=true;
                 this.alertShow=true;
+                if (this.$refs.shear.rotation) {
+                    this.$refs.shear.rotation()
+                };
                 break //剪切板弹窗
             case 3://向右移动光标
                 this.cursorRight();
@@ -612,11 +625,17 @@ export default {
         this.showPy=true;
         this.alertShow=true;
         this.alertIf=true;
+        if (this.$refs.py.rotation) {
+            this.$refs.py.rotation()
+        };
     },
     closeAlert(e={type:'click'}){
         if(e.type=='click'||(e.direction=='right'&&e.distance>=200)){
             clearTimeout(timer_alert);
             this.alertShow=false;
+            if (this.$refs.text.rotation) {
+                this.$refs.text.rotation()
+            };
         }
     },
     //表冠引擎
@@ -627,11 +646,11 @@ export default {
         if (this.linePos>0) {
             let gap=this.linePos;
             this.linePos=Math.min(100,this.linePos+(this.focusValue-value)*30*(1-gap/100));
-            timer_focus=setTimeout(()=>{moveKey=false;this.back(0)},50)
+            timer_focus=setTimeout(()=>{moveType=0;this.back(0)},50)
         }else if(this.linePos<lineHeight){
             let gap=lineHeight-this.linePos;
             this.linePos=Math.max(lineHeight-100,this.linePos+(this.focusValue-value)*30*(1-gap/100));
-            timer_focus=setTimeout(()=>{moveKey=false;this.back(lineHeight)},50)
+            timer_focus=setTimeout(()=>{moveType=0;this.back(lineHeight)},50)
         }else {
             this.linePos+=(this.focusValue-value)*30;
         };
@@ -656,13 +675,28 @@ export default {
             this.aniPos=0;
             this.aniOpacity=0;
         };
-        moveKey=target;
+        if (target&&e.direction=='up') {
+            moveType=2;
+            const line=Math.floor((e.globalY-205)/60);
+            if (line<0||line>2||e.globalX-this.keyPos-29*line<0)return;
+            const row=Math.floor((e.globalX-this.keyPos-29*line)/57);
+            if (row<0||row>(this.keyType==3?12:9)-line)return;
+            clearTimeout(timer_popup);
+            this.popup.left=row*57+29*line+this.keyPos-16;
+            this.popup.top=line*60+100;
+            this.popup.lowerLimit=line*60+110;
+            this.popup.text=this.getShiftText(line,row);
+        }else {
+            moveType=target?1:0;
+            timeArr.unshift(e.timestamp);
+        };
         oriX=e.globalX;
         oriY=e.globalY;
-        timeArr.unshift(e.timestamp);
     },
     touchMove(e){
-        if (moveKey) {
+        if (moveType==2){
+            this.popup.top+=e.globalY-oriY;
+        }else if (moveType==1) {
             let maxLimit=this.keyType==3?-275:-104;
             let distance=0;
             distance=e.globalX-oriX;
@@ -699,7 +733,10 @@ export default {
     touchEnd(){
         let maxLimit=this.keyType==3?-275:-104;
         //结束时的处理
-        if (moveKey){
+        if (moveType==2){
+            this.input(this.popup.text);
+            this.popup.text='';
+        }else if (moveType==1){
             if (this.keyPos>0) {
                 if(this.keyPos>80)this.decKeyboard();
                 else this.back(0);
@@ -736,8 +773,8 @@ export default {
             let vel = v * 22; // px/ms → px/帧
             const that=this;
             let oneFrame;
-            if (moveKey) {
-                let maxLimit=this.keyType==3?-333:-162;
+            if (moveType==1) {
+                let maxLimit=this.keyType==3?-275:-104;
                 oneFrame=()=>{
                     if (that.keyPos>=0) {
                         let gap=that.keyPos;
@@ -815,7 +852,7 @@ export default {
             return step;
         };
         let fn;
-        if (moveKey){
+        if (moveType==1){
             fn=() => {
                 const diff = end - that.keyPos;
                 if (Math.abs(diff) < 0.1) {
@@ -843,7 +880,7 @@ export default {
                 this.keyPos=0;
                 this.aniDotPos=0;
             }else{
-                this.keyPos=this.aniPos+408;
+                this.keyPos=this.aniPos+466;
                 this.aniDotPos=100;
             };
             this.aniPos=0;
@@ -855,7 +892,7 @@ export default {
             lineHeight+=Math.ceil(w/numOfLists);
         });
         lineHeight*=-38;
-        moveKey=false;
+        moveType=0;
         this.back(this.lineWArr.length*-38);
     },
     //左滑

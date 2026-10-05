@@ -24,8 +24,8 @@
             <image class="container" src="/common/keyboard/common/selectBar.png"></image>
             <list class="bar_pyList">
                 <list-item style="width: 5px;"></list-item>
-                <list-item class="bar_pyItem" style="width: {{$item.word.length*30}};" for="{{pyList}}">
-                    <text grab:click="clickCn($idx)">{{$item.word}}</text>
+                <list-item grab:click="clickCn($idx)" class="bar_pyItem" style="width: {{$item.word.length*30+10}};" for="{{pyList}}">
+                    <text>{{$item.word}}</text>
                 </list-item>
                 <list-item style="width: 40px;">
                 </list-item>
@@ -51,7 +51,7 @@
         <input class="btn" if="{{!allowNewline}}" grab:click="done" style="width: 70px;left: 265px;background-image:url('/common/keyboard/circle/search.png');"></input>
     </stack>
 <!--    点击反馈-->
-    <text class="popup" show="{{!!popup.text}}" style="animation-name: {{!!popup.text?'pop':''}};left: {{popup.left}};top: {{popup.top}};">{{popup.text}}</text>
+    <text class="popup" show="{{!!popup.text}}" style="opacity: {{popup.lowerLimit>0?(popup.lowerLimit-popup.top)/20:1}};animation-name: {{!popup.lowerLimit&&popup.text?'pop':''}};left: {{popup.left}};top: {{popup.lowerLimit>0?Math.min(popup.lowerLimit,popup.top):popup.top}};">{{popup.text}}</text>
 <!--    弹窗-->
     <stack class="container" show="{{alertShow}}" grab:click="grabClick" grab:swipe="closeAlert"></stack>
     <div class="alert" show="{{alertIf}}" grab:swipe="closeAlert" style="top: {{100+(alertShow?0:380)}};animation-name: {{alertShow?'up':'down'}};">
@@ -59,7 +59,7 @@
             <text style="font-size: 38px;font-family: {{font}};">{{showPy?'更多选项':'剪切板('+shearList.length+'/15)'}}</text>
             <input class="alert_close" on:click="closeAlert"></input>
         </div>
-        <list class="alert_list" if="{{showPy}}">
+        <list class="alert_list" show="{{showPy}}" ref="py">
             <list-item class="alert_smallItem" for="{{pyFullList}}">
                 <text class="alert_py" grab:click="clickCn($idx*4)">{{$item[0].word}}</text>
                 <text class="alert_py" grab:click="clickCn($idx*4+1)" style="opacity: {{1-!$item[1]}};">{{$item[1].word}}</text>
@@ -70,7 +70,7 @@
                 <text style="font-size: 30px;color: grey;">{{pyFullList.length>0?'':'加载中,请稍后'}}</text>
             </list-item>
         </list>
-        <list class="alert_list" style="width: 360px;" else>
+        <list class="alert_list" style="width: 360px;" show="{{!showPy}}" ref="shear">
             <list-item class="alert_item" for="{{shearList}}">
                 <text class="alert_shear" on:click="clickShear($item)">{{$item}}</text>
             </list-item>
