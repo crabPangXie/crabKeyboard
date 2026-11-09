@@ -1,0 +1,4 @@
+<div class="container">
+    <text class="name">{{name}}</text>
+    <text class="load_text">正在加载{{progress}}%</text>
+</div>

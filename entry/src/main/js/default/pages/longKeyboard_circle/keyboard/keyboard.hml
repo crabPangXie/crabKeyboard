@@ -1,0 +1,100 @@
+<stack class="container" on:click="switchKbd" on:swipe="close" on:touchstart="touchStart(false)" on:touchmove="touchMove" on:touchend="touchEnd">
+    <slider on:change="listenCrown" max="100" value="{{focusValue}}" min="0" ref="text"></slider>
+    
+    <text class="text" on:longpress="pressText" style="top: {{linePos+70}};">{{prevLines}}</text>
+    <div class="text" on:longpress="pressText" style="width: 320px;height: 38px;top: {{linePos+38*lineWArr.length+70}};">
+        <text style="line-height:38px;">{{text}}</text>
+        <div class="text_cursor" style="opacity: {{showCursor||cursorSteady?1:0}};margin-left: {{text.length==0?0:-2}};margin-right: {{text.length==0?-3:-1}}"></div>
+        <text style="line-height:38px">{{nextText}}</text>
+    </div>
+    <text class="text" on:longpress="pressText" style="width: 320px;top: {{linePos+38*lineWArr.length+108}};">{{nextLines}}</text>
+    <text class="text" if="{{!prevLines&&!text&&nextText==constN&&!nextLines}}" style="top: {{linePos+70}};color: #808080;">{{prompt}}</text>
+<!--    底部保存按钮（键盘收起时滑入，层级在键盘下方）-->
+    <div class="tool_div" show="{{dirty}}" style="top: {{displayKbd?466:366}};animation-name: {{displayKbd?'saveDown':'saveUp'}};">
+        <input class="save" grab:click="showExitConfirm" value="保存"></input>
+    </div>
+
+    <stack class="container keyAni" style="top: {{showKbd&&displayKbd?0:365}};animation-name: {{showKbd&&displayKbd?'appear':'hide'}};">
+
+    <!--        拼音栏-->
+        <image if="{{!!pinyin}}" style="width: 466px;height: 35px;top: 99px;" src="/common/keyboard/common/pyShadow.png"></image>
+        <text if="{{!!pinyin}}" style="left: 50px;top:96px;height: 38px;color:#3895FF;">{{pinyin}}</text>
+    <!--键盘背景-->
+        <stack class="keyContainer" grab:swipe="grabClick" grab:click="grabClick">
+        <!--        工具栏-->
+            <image class="bar" grab:click="clickFn" grab:longpress="pressFn" grab:touchend="stopOperate" src="/common/keyboard/common/toolBar.png"></image>
+            <image style="width: 31px;height: 31px;left: 128px;top: 21px;" src="/common/keyboard/common/key{{keyType}}.png"></image>
+        <!--        中文候选栏-->
+            <stack show="{{!!pinyin}}" class="bar" grab:click="expandPy">
+                <image class="container" src="/common/keyboard/common/selectBar.png"></image>
+                <list class="bar_pyList">
+                    <list-item style="width: 5px;"></list-item>
+                    <list-item grab:click="clickCn($idx)" class="bar_pyItem" style="width: {{$item.word.length*30+10}};" for="{{pyList}}">
+                        <text>{{$item.word}}</text>
+                    </list-item>
+                    <list-item style="width: 40px;">
+                    </list-item>
+                </list>
+                <image class="bar_shadow" src="/common/keyboard/common/shadow.png"></image>
+                <image class="bar_cover" src="/common/keyboard/common/toolCover.png"></image>
+            </stack>
+        <!--        删除键-->
+            <input class="delete" grab:click="delete" grab:longpress="pressDelete" grab:touchend="stopOperate"></input>
+        <!--        键盘本体-->
+            <image grab:click="click" grab:longpress="press"  grab:touchstart="touchStart(true)" grab:touchmove="touchMove" grab:touchend="touchEnd" class="keyboard" style="width: {{keyType==3?741:570}};left: {{keyPos}};opacity: {{1-aniOpacity}};" src="/common/keyboard/common/{{keyType}}.png"></image>
+        <!--        用于切换键盘时播放动画的图片-->
+            <image class="keyboard" if="{{!!aniPos}}" style="width: {{aniType==3?741:570}};left: {{aniPos+keyPos}};opacity: {{aniOpacity}};" src="/common/keyboard/common/{{aniType}}.png"></image>
+        <!--        切换提示-->
+            <image class="tip" show="{{!aniPos}}" style="left: {{keyPos-68}};opacity: {{(keyPos-40)/30}};" if="true" src="/common/keyboard/common/switchL.png"></image>
+            <image class="tip" show="{{!aniPos}}" style="left: {{keyPos+(keyType==3?741:570)+30}};opacity: {{-(keyPos+(keyType==3?275:104)+40)/30}};" src="/common/keyboard/common/switchR.png"></image>
+        <!--        底部滑动进度条-->
+            <stack class="progress"></stack>
+            <image src="/common/keyboard/common/dot.png" class="progress_dot" style="left: {{165+(aniPos?aniDotPos:100*keyPos/(keyType==3?-275:-104))}};"></image>
+        <!--        space,enter键-->
+            <input class="btn" grab:click="clickSpace" style="left: 131px;background-image:url('/common/keyboard/circle/space.png');"></input>
+            <input class="btn" grab:click="enter" style="left: 265px;background-image:url('/common/keyboard/circle/enter.png');"></input>
+        </stack>
+        <text class="popup" show="{{!!popup.text}}" style="opacity: {{popup.lowerLimit>0?(popup.lowerLimit-popup.top)/20:1}};animation-name: {{!popup.lowerLimit&&popup.text?'pop':''}};left: {{popup.left}};top: {{popup.lowerLimit>0?Math.min(popup.lowerLimit,popup.top):popup.top}};">{{popup.text}}</text>
+    </stack>
+
+<!--    弹窗-->
+    <stack class="container" if="{{alertShow||confirmShow}}" grab:click="close" grab:swipe="close" style="background-color: #26000000;"></stack>
+    <div grab:click="grabClick" class="alert" show="{{alertIf}}" grab:swipe="closeAlert" style="top: {{100+(alertShow?0:380)}};animation-name: {{alertShow?'up':'down'}};">
+        <div class="alert_bar">
+            <text style="font-size: 38px;font-family: {{font}};">{{showPy?'更多选项':'剪切板('+shearList.length+'/15)'}}</text>
+            <input class="alert_close" on:click="closeAlert"></input>
+        </div>
+        <list class="alert_list" show="{{showPy}}" ref="py">
+            <list-item class="alert_smallItem" for="{{pyFullList}}">
+                <text class="alert_py" grab:click="clickCn($idx*4)">{{$item[0].word}}</text>
+                <text class="alert_py" grab:click="clickCn($idx*4+1)" style="opacity: {{1-!$item[1]}};">{{$item[1].word}}</text>
+                <text class="alert_py" grab:click="clickCn($idx*4+2)" style="opacity: {{1-!$item[2]}};">{{$item[2].word}}</text>
+                <text class="alert_py" grab:click="clickCn($idx*4+3)" style="opacity: {{1-!$item[3]}};">{{$item[3].word}}</text>
+            </list-item>
+            <list-item class="alert_smallItem">
+                <text style="font-size: 24px;color: grey;">{{pyFullList.length>0?'':'加载中,请稍后'}}</text>
+            </list-item>
+        </list>
+        <list class="alert_list" style="width: 360px;" show="{{!showPy}}" ref="shear">
+            <list-item class="alert_item" for="{{shearList}}">
+                <text class="alert_shear" on:click="clickShear($item)">{{$item}}</text>
+            </list-item>
+            <list-item class="alert_smallItem">
+                <text style="font-size: 24px;color: grey;">长按文字区域可复制当前行</text>
+            </list-item>
+            <list-item style="height: 80px;"></list-item>
+        </list>
+    </div>
+    <text class="msg" if="{{!!msg.content}}" grab:click="closeMsg">{{ msg.content }}</text>
+
+<!--    退出确认弹窗-->
+    <div class="confirm" show="{{confirmIf}}" style="top: {{150+(confirmShow?0:330)}};animation-name: {{confirmShow?'confirmUp':'confirmDown'}};" grab:click="grabClick">
+        <text class="confirm_title" style="font-family: {{font}};">是否保存?</text>
+        <div class="confirm_row">
+            <input class="confirm_btn" value="放弃" on:click="discardAndExit"></input>
+            <div style="width: 1px;height: 30px;background-color: #505050;"></div>
+            <input class="confirm_btn" style="color: #3895FF;" value="保存并退出" on:click="saveAndExit"></input>
+        </div>
+    </div>
+
+</stack>

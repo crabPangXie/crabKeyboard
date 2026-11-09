@@ -2,7 +2,7 @@
  * 项目名称：CrabKeyboard
  * 项目作者：crabKun
  * 文件用途：LiteWearable 中文输入键盘及候选词处理
- * 当前版本：1.1.5
+ * 当前版本：2.0.0
  * 开源协议：MIT License
  * 创建日期：2026.8.29
  */
@@ -47,7 +47,7 @@ let timer_ani;
 let timer_alert;
 let timer_focus;
 let timer_popup;
-let moveType=0;//0：文本框，1：键盘，2：滑动输入
+let moveType=-1;//0：文本框，1：键盘，2：滑动输入
 let oriX=0;
 let oriY=0;
 let disArr=[];
@@ -694,6 +694,7 @@ export default {
         oriY=e.globalY;
     },
     touchMove(e){
+        if (moveType<0)return;
         if (moveType==2){
             this.popup.top+=e.globalY-oriY;
         }else if (moveType==1) {
@@ -713,7 +714,7 @@ export default {
             timeArr.unshift(e.timestamp);
             if(timeArr.length>4)timeArr.length=4;
             if(disArr.length>3)disArr.length=3;
-        }else {
+        }else if (moveType==0){
             let distance=0;
             distance=e.globalY-oriY;
             if (this.linePos>=0&&distance>0) {
@@ -734,6 +735,7 @@ export default {
         oriY=e.globalY;
     },
     touchEnd(){
+        if (moveType<0)return;
         let maxLimit=this.keyType==3?-333:-162;
         //结束时的处理
         if (moveType==2){
@@ -747,7 +749,7 @@ export default {
                 if(this.keyPos<maxLimit-80 )this.incKeyboard();
                 else this.back(maxLimit)
             }else this.inertia()
-        }else {
+        }else if (moveType==0){
             if (this.linePos>0) {
                 this.back(0);
             }else if (this.linePos<lineHeight){
@@ -756,6 +758,7 @@ export default {
         };
         disArr.length=0;
         timeArr.length=0;
+        moveType=-1;
     },
     //惯性动画
     inertia(){

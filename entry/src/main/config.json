@@ -3,8 +3,8 @@
     "bundleName": "com.crab.keyboard",
     "vendor": "crab",
     "version": {
-      "code": 3,
-      "name": "1.1.5"
+      "code": 5,
+      "name": "2.0.0"
     }
   },
   "deviceConfig": {
@@ -31,7 +31,11 @@
         "pages": [
           "pages/index/index",
           "pages/keyboard_circle/keyboard",
-          "pages/keyboard_rect/keyboard"
+          "pages/keyboard_rect/keyboard",
+          "pages/longKeyboard_circle/load/load",
+          "pages/longKeyboard_circle/keyboard/keyboard",
+          "pages/longKeyboard_rect/load/load",
+          "pages/longKeyboard_rect/keyboard/keyboard"
         ],
         "name": "default"
       }
