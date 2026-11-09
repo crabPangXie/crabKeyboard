@@ -810,7 +810,7 @@ export default {
                         }else clearInterval(timer_ani);
                     };
                 };
-            }else{
+            }else if (moveType==0){
                 oneFrame=()=>{
                     if (that.linePos>=0) {
                         let gap=that.linePos;
