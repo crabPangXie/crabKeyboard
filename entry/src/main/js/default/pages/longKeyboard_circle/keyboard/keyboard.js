@@ -937,7 +937,7 @@ export default {
                 } else {
                     that.keyPos += diff * getStep();
                 }}
-        }else {
+        }else if (moveType==0) {
             fn=() => {
                 const diff = end - that.linePos;
                 if (Math.abs(diff) < 0.1) {
